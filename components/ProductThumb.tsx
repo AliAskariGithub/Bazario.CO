@@ -1,0 +1,41 @@
+import { Product } from "@/sanity.types";
+import { imageUrl } from "@/sanity/lib/imageUrl";
+import Image from "next/image";
+import Link from "next/link";
+
+function ProductThumb({ product }: { product: Product }) {
+  const isOutOfStock = product.stock != null && product.stock <= 0;
+
+  return (
+    <Link
+      href={`/product/${product.slug?.current}`}
+      className={`group flex flex-col bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transititon-all duration-200 overflow-hidden ${isOutOfStock ? "opacity-50" : ""}`}
+    >
+     <div className="relative aspect-square w-full h-full overflow-hidden"> 
+        {product.image && (
+            <Image className="object-contain transition-transform duration-300 group-hover:scale-105" src={imageUrl(product.image).url()} alt={product.name || "Product Image"} fill sizes="(max-widht: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"/>
+        )}
+        {isOutOfStock && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <span className="text-white font-blod text-lg">Out of stock</span>
+            </div>
+        )}
+     </div>
+     <div className="p-4">
+        <h2 className="text-lg font-semibold text-black/80 truncate">
+            {product.name}
+        </h2>
+
+        <p className="text-sm text-black/60 line-clamp-2 mt-2">
+            {product.description?.map((block) => block._type === "block" ? block.children.map((child) => child.text).join("") : "").join("") || "No description available" }
+        </p>
+
+        <p className="text-lg font-bold mt-2 text-black/90">
+        Rs {product.price?.toFixed(2)}
+        </p>
+     </div>
+    </Link>
+  );
+}
+
+export default ProductThumb;
